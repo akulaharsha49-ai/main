@@ -60,53 +60,12 @@ with col2:
         st.markdown("<h2 style='margin-top:15px;'>91 Care</h2>", unsafe_allow_html=True)
 
 # -----------------------------
-# All Credentials
-# -----------------------------
-# Admin panel credentials
-ADMIN_CREDENTIALS = {
-    "admin": "admin123"
-}
-
-# Role-based credentials per module
-# Format: ROLE_CREDENTIALS[module][role] = { username: password, ... }
-ROLE_CREDENTIALS = {
-    "OPD": {
-        "🩺Doctor":        {"doctor": "doctor123"},
-        "💉Nurse":         {"nurse": "nurse123"},
-        "📞Receptionist":  {"receptionist": "receptionist123"},
-        "🧑‍💻Admin":       {"admin": "admin123"},
-    },
-    "LAB": {
-        "🩺Doctor":        {"doctor": "doctor123"},
-        "💉Nurse":         {"nurse": "nurse123"},
-        "📞Receptionist":  {"receptionist": "receptionist123"},
-        "🧑‍💻Admin":       {"admin": "admin123"},
-        "🧪Phlebotomist":  {"phlebotomist": "phlebotomist123"},
-        "🔬Pathologist":   {"pathologist": "pathologist123"},
-    },
-    "IPD": {
-        "🩺Doctor":        {"doctor": "doctor123"},
-        "💉Nurse":         {"nurse": "nurse123"},
-        "📞Receptionist":  {"receptionist": "receptionist123"},
-        "🧑‍💻Admin":       {"admin": "admin123"},
-    },
-    "pharmacy": {
-        "👨‍⚕️pharmacist ": {"pharmacist": "pharmacist123"},
-        "🧑‍💻Admin":       {"admin": "admin123"},
-    },
-}
-
-# -----------------------------
 # Session State Initialization
 # -----------------------------
 defaults = {
     "module": None,
     "role": None,
     "step": "module",
-    "admin_logged_in": False,
-    "admin_login_error": False,
-    "role_logged_in": False,
-    "role_login_error": False,
 }
 for k, v in defaults.items():
     if k not in st.session_state:
@@ -161,58 +120,16 @@ def module_selection():
 
     if col5.button("🧑‍💻 Admin", use_container_width=True):
         st.session_state.module = "Admin"
-        st.session_state.step = "admin_login"
-
-# =============================================
-# ADMIN LOGIN PAGE
-# =============================================
-def admin_login():
-    if st.button("⬅ Back", key="back_admin_login"):
-        st.session_state.module = None
-        st.session_state.step = "module"
-        st.session_state.admin_logged_in = False
-        st.session_state.admin_login_error = False
-        st.rerun()
-
-    st.subheader("🔐 Admin Login")
-    st.markdown("Please enter your admin credentials to continue.")
-
-    with st.form("admin_login_form"):
-        username = st.text_input("Username", placeholder="Enter username")
-        password = st.text_input("Password", type="password", placeholder="Enter password")
-        submitted = st.form_submit_button("Login", use_container_width=True)
-
-        if submitted:
-            if username in ADMIN_CREDENTIALS and ADMIN_CREDENTIALS[username] == password:
-                st.session_state.admin_logged_in = True
-                st.session_state.admin_login_error = False
-                st.session_state.step = "admin_main"
-                st.rerun()
-            else:
-                st.session_state.admin_login_error = True
-
-    if st.session_state.admin_login_error:
-        st.error("❌ Invalid username or password. Please try again.")
+        st.session_state.step = "admin_main"
 
 # =============================================
 # ADMIN MAIN MENU
 # =============================================
 def admin_main():
-    if not st.session_state.admin_logged_in:
-        st.session_state.step = "admin_login"
-        st.rerun()
-        return
-
     col_back, col_logout = st.columns([6, 1])
     with col_back:
         if st.button("⬅ Back to Modules", key="back_admin_main"):
             st.session_state.module = None
-            st.session_state.admin_logged_in = False
-            st.session_state.step = "module"
-            st.rerun()
-    with col_logout:
-        if st.button("🚪 Logout", key="logout_admin"):
-            st.session_state.admin_logged_in = False
             st.session_state.step = "module"
             st.rerun()
 
@@ -268,44 +185,6 @@ def admin_main():
             st.session_state.step = "admin_UHID"
 
 # =============================================
-# ROLE LOGIN PAGE
-# =============================================
-def role_login():
-    if st.button("⬅ Back", key="back_role_login"):
-        st.session_state.role = None
-        st.session_state.role_logged_in = False
-        st.session_state.role_login_error = False
-        st.session_state.step = "role"
-        st.rerun()
-
-    module = st.session_state.module
-    role = st.session_state.role
-    role_icon = role.split()[0] if role else ""
-
-    st.subheader(f"🔐 {module} — {role} Login")
-    st.markdown("Please enter your credentials to continue.")
-
-    # Build hint from credentials dict
-    creds = ROLE_CREDENTIALS.get(module, {}).get(role, {})
-
-    with st.form("role_login_form"):
-        username = st.text_input("Username", placeholder="Enter username")
-        password = st.text_input("Password", type="password", placeholder="Enter password")
-        submitted = st.form_submit_button("Login", use_container_width=True)
-
-        if submitted:
-            if username in creds and creds[username] == password:
-                st.session_state.role_logged_in = True
-                st.session_state.role_login_error = False
-                st.session_state.step = "main"
-                st.rerun()
-            else:
-                st.session_state.role_login_error = True
-
-    if st.session_state.role_login_error:
-        st.error("❌ Invalid username or password. Please try again.")
-
-# =============================================
 # ROLE SELECTION
 # =============================================
 def role_selection():
@@ -327,32 +206,16 @@ def role_selection():
     for i, role in enumerate(roles):
         if cols[i % 3].button(role, use_container_width=True):
             st.session_state.role = role
-            st.session_state.role_logged_in = False
-            st.session_state.role_login_error = False
-            st.session_state.step = "role_login"
+            st.session_state.step = "main"
 
 # =============================================
 # MAIN MENU (OPD / LAB / IPD / Pharmacy)
 # =============================================
 def main_menu():
-    if not st.session_state.role_logged_in:
-        st.session_state.step = "role_login"
+    if st.button("⬅ Back", key="back_role"):
+        st.session_state.role = None
+        st.session_state.step = "role"
         st.rerun()
-        return
-
-    col_back, col_logout = st.columns([6, 1])
-    with col_back:
-        if st.button("⬅ Back", key="back_role"):
-            st.session_state.role = None
-            st.session_state.role_logged_in = False
-            st.session_state.step = "role"
-            st.rerun()
-    with col_logout:
-        if st.button("🚪 Logout", key="logout_role"):
-            st.session_state.role = None
-            st.session_state.role_logged_in = False
-            st.session_state.step = "module"
-            st.rerun()
 
     module = st.session_state.module
     role = st.session_state.role
@@ -1723,14 +1586,10 @@ if step == "module":
     module_selection()
 elif step == "role":
     role_selection()
-elif step == "role_login":
-    role_login()
 elif step == "main":
     main_menu()
 
 # --- Admin flow ---
-elif step == "admin_login":
-    admin_login()
 elif step == "admin_main":
     admin_main()
 elif step == "admin_Clinics":
