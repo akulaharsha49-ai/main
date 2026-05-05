@@ -110,11 +110,11 @@ def module_selection():
         st.session_state.module = "LAB"
         st.session_state.step = "role"
 
-    if col3.button("💊 IPD", use_container_width=True):
+    if col3.button("🛏️ IPD", use_container_width=True):
         st.session_state.module = "IPD"
         st.session_state.step = "role"
 
-    if col4.button("👨‍⚕️ Pharmacy", use_container_width=True):
+    if col4.button("💊 Pharmacy", use_container_width=True):
         st.session_state.module = "pharmacy"
         st.session_state.step = "role"
 
@@ -413,7 +413,7 @@ def main_menu():
                 if st.button("❌ Cancel Appointment", key="ipd_cancel_2"):
                     st.session_state.step = "cancel_appointment"
             with col2:
-                if st.button("📁 Consent Form", key="ipd_consent_2"):
+                if st.button("✍️ Consent Form", key="ipd_consent_2"):
                     st.session_state.step = "consent_form"
             with col3:
                 if st.button("📅 Schedule Consultation", key="ipd_schedule_2"):
@@ -566,7 +566,7 @@ def main_menu():
                 if st.button("⬆️ Update Admission", key="ipd_update_4"):
                     st.session_state.step = "Update_Admission"
             with col3:
-                if st.button("📁 Consent Form", key="ipd_consent_4"):
+                if st.button("✍️ Consent Form", key="ipd_consent_4"):
                     st.session_state.step = "consent_form"
 
             col1, col2, col3 = st.columns(3)
